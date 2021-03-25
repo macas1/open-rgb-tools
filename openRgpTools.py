@@ -20,7 +20,7 @@ class Effect:
         self.frameCount = 0
 
         if zone is None:
-            zone = [[]]
+            self.frame = [[]]
         self.set_size_from_zone(zone)
 
     def __next__(self):
@@ -35,18 +35,18 @@ class Effect:
 
     def set_size_from_zone(self, zone):
         self.frame = []
-        for row in zone.matrix_map:
+        for row in get_zone_matrix_map(zone):
             self.frame.append([None] * len(row))
 
     def apply_to_zone(self, zone):
         colors = zone.colors
-        matrix_map = zone.matrix_map
+        matrix_map = get_zone_matrix_map(zone)
 
         for row in range(len(self.frame)):
             if len(matrix_map) < row:
                 continue
 
-            for col in range(len(matrix_map[row])):
+            for col in range(len(self.frame[row])):
                 if len(matrix_map[row]) < col:
                     continue
 
@@ -59,9 +59,12 @@ class EffectZone:
     zone = None
     effects = None
 
-    def __init__(self, zone, effects=[]):
+    def __init__(self, zone, effects=None):
         self.zone = zone
-        self.effects = effects
+        if effects:
+            self.effects = effects
+        else:
+            self.effects = []
 
     def __next__(self):
         for e in self.effects:
@@ -74,7 +77,7 @@ class EffectZone:
             zone = self.zone
         self.effects.append(Effect(func, zone))
 
-    def add_effect(self, effect, match_zone_size=True):
+    def add_effect(self, effect):
         self.effects.append(effect)
 
 # =============================================================================
@@ -98,6 +101,15 @@ def get_device_by_name(client, name):
     for d in client.devices:
         if d.name == name:
             return d
+
+
+def get_zone_matrix_map(zone):
+    matrix_map = zone.matrix_map
+    if not matrix_map == [[]]:
+        return matrix_map
+
+    # If there is no matrix map make a linear one
+    return [list(range(len(zone.colors)))]
 
 
 def get_random_color():

@@ -7,6 +7,7 @@ from time import sleep
 
 
 KEYBOARD_NAME = "Razer BlackWidow Elite"
+MOUSE_NAME = "Razer DeathAdder Elite"
 
 
 # ===================================================
@@ -47,17 +48,23 @@ def main():
     while True:
         # Get Client
         client = get_client()
+        print_devices(client)
 
-        # Key keyboard and add effects
+        # Add keyboard and add effects
         keyboard = EffectZone(get_device_by_name(client, KEYBOARD_NAME).zones[0])
         keyboard.add_effect_from_func(e1)
         keyboard.add_effect_from_func(e2)
         keyboard.add_effect_from_func(e3)
 
+        # Add mouse and effects
+        mouse = EffectZone(get_device_by_name(client, MOUSE_NAME).zones[0])
+        mouse.add_effect_from_func(e1)
+
         # Loop through effect frames
         while True:
             try:
                 next(keyboard)
+                next(mouse)
             except ConnectionAbortedError:
                 break
             sleep(1)
