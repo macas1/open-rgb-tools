@@ -14,7 +14,7 @@ class Effect:
     isPaused = None
     frameCount = None
 
-    def __init__(self, func, zone=None):
+    def __init__(self, func=None, zone=None):
         self.func = func
         self.isPaused = False
         self.frameCount = 0
@@ -25,7 +25,8 @@ class Effect:
 
     def __next__(self):
         if not self.isPaused:
-            self.func(self)
+            if self.func:
+                self.func(self)
             self.frameCount += 1
 
     def clear(self):
@@ -116,14 +117,17 @@ def get_random_color():
     return RGBColor(randint(0, 255), randint(0, 255), randint(0, 255))
 
 
-def print_names(obj_arr):
-    for i in range(len(obj_arr)):
-        print("(" + str(i) + ") " + obj_arr[i].name)
+def print_rgb_zone(device, indent=0):
+    print(indent*" " + str(device.id) + ". " + device.name)
 
 
 def print_devices(client):
-    print("ee_devices")
-    print_names(client.ee_devices)
+    device_types = {"ee_devices": client.ee_devices,
+                    "devices": client.devices}
 
-    print("devices")
-    print_names(client.devices)
+    for device_type in device_types:
+        print(device_type)
+        for device in device_types[device_type]:
+            print_rgb_zone(device, 4)
+            for zone in device.zones:
+                print_rgb_zone(zone, 8)
