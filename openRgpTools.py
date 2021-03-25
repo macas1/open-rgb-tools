@@ -1,5 +1,7 @@
+from openrgb import OpenRGBClient
 from openrgb.utils import RGBColor
 from random import randint
+from time import sleep
 
 # =============================================================================
 # Classes
@@ -48,7 +50,7 @@ class Effect:
                 if len(matrix_map[row]) < col:
                     continue
 
-                if self.frame[row][col] is not None:
+                if self.frame[row][col] is not None and matrix_map[row][col] is not None:
                     colors[matrix_map[row][col]] = self.frame[row][col]
         zone.set_colors(colors)
 
@@ -78,6 +80,14 @@ class EffectZone:
 # =============================================================================
 # Functions
 # =============================================================================
+
+
+def get_client():
+    while True:
+        try:
+            return OpenRGBClient()
+        except ConnectionRefusedError:
+            sleep(2)
 
 
 def get_device_by_name(client, name):
