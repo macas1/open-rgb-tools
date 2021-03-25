@@ -59,7 +59,7 @@ class EffectZone:
     zone = None
     effects = None
 
-    def __init__(self, zone, effects = []):
+    def __init__(self, zone, effects=[]):
         self.zone = zone
         self.effects = effects
 
