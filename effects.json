@@ -1,0 +1,30 @@
+[
+  {
+    "device": "Razer BlackWidow Elite",
+    "zone": "Keyboard",
+    "effects": [
+      {
+        "name": "Random colors",
+        "options": {}
+      },
+      {
+        "name": "Iterate rows with random colors",
+        "options": {}
+      },
+      {
+        "name": "Iterate columns with random colors",
+        "options": {}
+      }
+    ]
+  },
+  {
+    "device": "Razer Goliathus Extended",
+    "zone": "LED Strip",
+    "effects": [
+      {
+        "name": "Random Colors",
+        "options": {}
+      }
+    ]
+  }
+]
