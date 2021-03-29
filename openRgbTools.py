@@ -100,7 +100,7 @@ def get_client():
         try:
             return OpenRGBClient()
         except ConnectionRefusedError:
-            sleep(2)
+            return None
 
 
 def get_device_by_name(client, name):
@@ -147,6 +147,14 @@ def print_devices(client):
             for zone in device.zones:
                 print_rgb_zone(zone, 8)
 
+def print_load_from_json_error(key, device_zone):
+    if key in device_zone:
+        print("The '" + str(key) + "' from the following json object was not found by openRBG:")
+    else:
+        print("'" + str(key) + "' does not exist in the following json object:")
+    print(device_zone)
+    print()
+    
 
 def load_effects_from_json(client):
     # Get data from file
@@ -156,13 +164,20 @@ def load_effects_from_json(client):
     # Create list of `EffectZone`s
     effect_zone_list = []
     for device_zone in json_data:
-        device = get_device_by_name(client, device_zone["device"])
-        zone = get_zone_by_name(device, device_zone["zone"])
-        effects_data = device_zone["effects"]
+        if not (device := get_device_by_name(client, device_zone["device"])):
+            print_load_from_json_error("device", device_zone)
+            continue
+        if not (zone := get_zone_by_name(device, device_zone["zone"])):
+            print_load_from_json_error("zone", device_zone)
+            continue
+        if not (effects_data := device_zone["effects"]):
+            print_load_from_json_error("effects", device_zone)
+            continue
 
         effects = []
         for effect_data in effects_data:
-            effect = get_effect_by_name(effect_data["name"])
+            if not (effect := get_effect_by_name(effect_data["name"])):
+                continue
             effect.set_size_from_zone(zone)
             effect.set_options(effect_data["options"])
             effects.append(effect)

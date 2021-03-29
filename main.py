@@ -9,10 +9,20 @@ from time import sleep
 def main():
     # Main Loop
     while True:
-        # Get Client and load effects from JSON
-        client = get_client()
+        # Get client
+        while not (client := get_client()):
+            sleep(2)
+            continue
+
+        # Print devices for the user
         print_devices(client)
+
+        # Load effects from 
         effects = load_effects_from_json(client)
+
+        # Check for effects (devices may not be ready yet)
+        if not effects:
+            sleep(2)
 
         # Loop through effect frames; If connection lost retry
         while True:

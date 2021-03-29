@@ -1,6 +1,6 @@
 [
   {
-    "device": "Razer BlackWidow Elite",
+    "device": "HyperX Alloy Origins",
     "zone": "Keyboard",
     "effects": [
       {
@@ -18,8 +18,28 @@
     ]
   },
   {
-    "device": "Razer Goliathus Extended",
+    "device": "HyperX Pulsefire Surge",
     "zone": "LED Strip",
+    "effects": [
+      {
+        "name": "Random Colors",
+        "options": {}
+      }
+    ]
+  },
+  {
+    "device": "HyperX Pulsefire Surge",
+    "zone": "Logo",
+    "effects": [
+      {
+        "name": "Random Colors",
+        "options": {}
+      }
+    ]
+  },
+  {
+    "device": "MSI Motherboard",
+    "zone": "MSI Zone",
     "effects": [
       {
         "name": "Random Colors",
