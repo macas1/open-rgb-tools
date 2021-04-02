@@ -5,8 +5,6 @@ from pynput.mouse import Listener as MouseListener
 from random import randint
 import json
 
-# TODO: Currently only working for some specific keys on my keyboard (after the row_col has been mapped)
-# TODO: I think it may be in `apply_frame` for `marge_frames`
 
 # =============================================================================
 # Classes
