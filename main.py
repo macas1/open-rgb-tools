@@ -18,17 +18,22 @@ def main():
         print_devices(client)
 
         # Load effects from 
-        effects = load_effects_from_json(client)
+        zone_effects = load_effects_from_json(client)
+
+        # Begin effect listeners
+        for zone_effect in zone_effects:
+            zone_effect.refresh_listener()
 
         # Check for effects (devices may not be ready yet)
-        if not effects:
+        if not zone_effects:
             sleep(2)
 
         # Loop through effect frames; If connection lost retry
         while True:
             try:
-                for effect in effects:
-                    next(effect)
+                for zone_effect in zone_effects:
+                    zone_effect.step_effects()
+                    zone_effect.update()
             except ConnectionAbortedError:
                 break
             sleep(1)
