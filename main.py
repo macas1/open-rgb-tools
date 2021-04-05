@@ -1,4 +1,4 @@
-from openRgbTools import *
+from open_rgb_tools import *
 from time import sleep
 
 # ===================================================
