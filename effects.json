@@ -5,15 +5,15 @@
     "effects": [
       {
         "name": "Random colors",
-        "options": {}
+        "options": {"duration": 1000}
       },
       {
         "name": "Iterate rows with random colors",
-        "options": {}
+        "options": {"duration": 1000}
       },
       {
         "name": "Iterate columns with random colors",
-        "options": {}
+        "options": {"duration": 1000}
       }
     ]
   },
@@ -23,7 +23,7 @@
     "effects": [
       {
         "name": "Random Colors",
-        "options": {}
+        "options": {"duration": 1000}
       }
     ]
   },
@@ -33,7 +33,7 @@
     "effects": [
       {
         "name": "Random Colors",
-        "options": {}
+        "options": {"duration": 1000}
       }
     ]
   },
@@ -43,7 +43,7 @@
     "effects": [
       {
         "name": "Random Colors",
-        "options": {}
+        "options": {"duration": 1000}
       }
     ]
   }

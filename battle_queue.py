@@ -31,10 +31,11 @@ class BattleQueueItem:
 class BattleQueue:
     queue = None
 
-    def __init__(self, queue):
+    def __init__(self, queue=None):
+        if queue is None:
+            queue = []
         queue = sorted(queue)
         self.queue = queue
-        self.reset()
 
     def __str__(self):
         out = "SleeperQueue:"
@@ -42,7 +43,15 @@ class BattleQueue:
             out += "\n" + str(i)
         return out
 
-    def reset(self):
+    def __add__(self, other):
+        self.queue += other.queue
+        self.queue = sorted(self.queue)
+        return self
+
+    def __bool__(self):
+        return bool(self.queue)
+
+    def activate(self):
         # Initial run (apply all with no delays)
         for i in self.queue:
             i.run()
@@ -60,7 +69,12 @@ class BattleQueue:
             else:
                 self.queue[i].relative_duration = self.queue[i].duration
 
-    def get_next(self):
+    def get_next_duration(self):
+        if self.queue[0].relative_duration is None:
+            return 0
+        return self.queue[0].relative_duration
+
+    def run_next(self, run_consecutive=False):
         # Empty case
         if not self.queue:
             return
@@ -70,8 +84,7 @@ class BattleQueue:
         del self.queue[0]
 
         # Run item
-        # sleep(item_current_rd)
-        # item.run()
+        item.run()
 
         # Get index to insert item and re-adjust durations effected by insertion
         item.relative_duration = item.duration
@@ -95,6 +108,10 @@ class BattleQueue:
         else:
             self.queue.append(item)
 
+        # Run all that should be run at the same time
+        if run_consecutive and self.get_next_duration() == 0:
+            self.run_next(run_consecutive=True)
+
 
 def main():
     item_set = [
@@ -106,11 +123,11 @@ def main():
 
     queue = BattleQueue(item_set)
     print("\n0 - " + str(queue))
+    queue.activate()
+    print("\n0 - " + str(queue))
     for i in range(30):
-        queue.get_next()
+        queue.run_next()
         print("\n" + str(i+1) + " - " + str(queue))
-        for x in queue.queue:
-            x.run()
 
 
 if __name__ == "__main__":

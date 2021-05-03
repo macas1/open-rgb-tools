@@ -3,6 +3,7 @@ from openrgb.utils import RGBColor, DeviceType
 from pynput.keyboard import Listener as KeyListener
 from pynput.mouse import Listener as MouseListener
 from random import randint
+from battle_queue import *
 import json
 
 
@@ -27,7 +28,7 @@ class Effect:
         self.set_options(options)
         self.frameCount = 0
 
-    def __next__(self):
+    def next(self):
         if self.func:
             self.func(self)
         self.frameCount += 1
@@ -46,10 +47,15 @@ class Effect:
         for row in get_zone_matrix_map(zone):
             self.frame.append([None] * len(row))
 
-    def set_options(self, options):
+    def set_options(self, options=None):
         if options is None:
             options = {}
-        self.effect_options = options
+        self.effect_options = options  # TODO: Make sure all options are camelcase here?
+
+    def get_duration(self):
+        if "duration" in self.effect_options and self.effect_options["duration"] not in ["once", "constant"]:
+            return self.effect_options["duration"]
+        return None
 
 
 class EffectZone:
@@ -74,11 +80,13 @@ class EffectZone:
         frame = None
         for e in self.effects:
             frame = self.merge_frames(frame, e.frame)
-        self.apply_frame(frame)
+
+        if frame is not None:
+            self.apply_frame(frame)
 
     def apply_frame(self, frame):
         # Create and apply zone colors
-        colors = self.zone.colors
+        colors = self.zone.colors.copy()
         matrix_map = get_zone_matrix_map(self.zone)
         for row in range(len(frame)):
             if len(matrix_map) < row:
@@ -91,7 +99,8 @@ class EffectZone:
                 if frame[row][col] is not None and matrix_map[row][col] is not None:
                     colors[matrix_map[row][col]] = frame[row][col]
 
-        self.zone.set_colors(colors)
+        if self.zone.set_colors != colors:
+            self.zone.set_colors(colors)
 
     def set_effects(self, effects=None):
         if effects:
@@ -136,6 +145,14 @@ class EffectZone:
         if self.input_listener:
             self.input_listener.stop()
 
+    def get_effect_queue(self):
+        queue = []
+        for effect in self.effects:
+            if effect.func:
+                queue.append(BattleQueueItem(effect.get_duration(), effect.next))
+
+        return BattleQueue(queue)
+
     def refresh_listener(self):
         # Stop previous listener
         self.stop_listener()
@@ -172,8 +189,12 @@ class EffectZone:
 
     @staticmethod
     def merge_frames(bottom_frame, top_frame):
-        if not bottom_frame:
+        if bottom_frame is None:
             return top_frame
+
+        output = []
+        for row in bottom_frame:
+            output.append([None] * len(row))
 
         for row in range(len(bottom_frame)):
             if len(top_frame) < row:
@@ -184,9 +205,11 @@ class EffectZone:
                     continue
 
                 if top_frame[row][col] is not None:
-                    bottom_frame[row][col] = top_frame[row][col]
+                    output[row][col] = top_frame[row][col]
+                else:
+                    output[row][col] = bottom_frame[row][col]
 
-        return bottom_frame
+        return output
 
     def get_pynput_key_zone_matrix_pos(self, key):
         # TODO: Could we save this map with pickle when it changes? then load it on start?
@@ -322,7 +345,8 @@ def load_effects_from_json(client):
                 continue
             effect.set_size_from_zone(zone)
             effect.zone = zone
-            effect.set_options(effect_data["options"])
+            if "options" in effect_data:
+                effect.set_options(effect_data["options"])
             effects.append(effect)
         effect_zone_list.append(EffectZone(zone, device.type, effects))
 
